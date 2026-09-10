@@ -1,0 +1,7 @@
+{
+  "name": "deep-work",
+  "description": "Seven-phase protocol for heavy builds, a decision council, and a session-close memory routine.",
+  "version": "1.0.0",
+  "author": { "name": "Jawahar Naidu Nettem", "url": "https://github.com/Jawahars07" },
+  "license": "MIT"
+}

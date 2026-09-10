@@ -1,0 +1,7 @@
+{
+  "name": "ship-safe",
+  "description": "Vet before you install. Sweep before you publish.",
+  "version": "1.0.0",
+  "author": { "name": "Jawahar Naidu Nettem", "url": "https://github.com/Jawahars07" },
+  "license": "MIT"
+}

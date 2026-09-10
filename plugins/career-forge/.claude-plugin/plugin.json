@@ -1,0 +1,7 @@
+{
+  "name": "career-forge",
+  "description": "Read a JD for what it actually requires, then build documents that only claim what you can prove.",
+  "version": "1.0.0",
+  "author": { "name": "Jawahar Naidu Nettem", "url": "https://github.com/Jawahars07" },
+  "license": "MIT"
+}

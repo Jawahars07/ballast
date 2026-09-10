@@ -1,0 +1,147 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------------------------------------------------
+      # 1. No executable surface inside any plugin.
+      #    Skills are markdown and inert assets. Nothing that can run on
+      #    install may enter plugins/.
+      # ------------------------------------------------------------------
+      - name: No executable files in plugins/
+        run: |
+          BAD=$(find plugins -type f \
+            \( -name '*.sh'  -o -name '*.js'  -o -name '*.mjs' -o -name '*.cjs' \
+            -o -name '*.py'  -o -name '*.rb'  -o -name '*.pl'  -o -name '*.bat' \
+            -o -name '*.ps1' -o -name '*.exe' -o -name '*.bin' \) )
+          EXECBIT=$(find plugins -type f -perm -u+x)
+          if [ -n "$BAD$EXECBIT" ]; then
+            echo "::error::executable surface found inside plugins/"
+            echo "$BAD"; echo "$EXECBIT"; exit 1
+          fi
+          echo "OK - plugins/ contains no scripts and no executable bits"
+
+      - name: No package manifests or lockfiles in plugins/
+        run: |
+          BAD=$(find plugins -type f \( -name 'package.json' -o -name 'package-lock.json' \
+            -o -name 'requirements.txt' -o -name 'pyproject.toml' -o -name 'Gemfile' \))
+          if [ -n "$BAD" ]; then
+            echo "::error::dependency manifest found inside plugins/"; echo "$BAD"; exit 1
+          fi
+          echo "OK - no dependency manifests, nothing to install"
+
+      # ------------------------------------------------------------------
+      # 2. Secrets. Working tree and full git history.
+      # ------------------------------------------------------------------
+      - name: Secret scan
+        run: |
+          PAT='(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{22,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'
+          if grep -rInE "$PAT" . --exclude-dir=.git --exclude-dir=.github ; then
+            echo "::error::secret pattern in working tree"; exit 1
+          fi
+          if git log -p --all | grep -InE "$PAT" ; then
+            echo "::error::secret pattern in git history"; exit 1
+          fi
+          echo "OK - no secret patterns in tree or history"
+
+      # ------------------------------------------------------------------
+      # 3. Personal data. These skills were generalised from a private
+      #    workspace; this gate stops any of it leaking back in.
+      # ------------------------------------------------------------------
+      - name: Personal-data scan
+        run: |
+          PII='(nettem|jawaharnaidu|essec|rta.living|anantapur|pandaece|pocketlite|adopt-eight|ohara/wiki|career-ops/|france.travail|[+]33[0-9 ]{9,}|10532003194)'
+
+          # (a) Skills must be impersonal. The author's name may appear in
+          #     attribution metadata, never inside a skill a stranger will run.
+          if grep -rInEi "$PII" plugins/ examples/ --include='*.md' --include='*.tex' ; then
+            echo "::error::personal data inside a skill or example"; exit 1
+          fi
+
+          # (b) Everywhere else, only these files may carry the author's name.
+          HITS=$(grep -rIlEi "$PII" . \
+                   --exclude-dir=.git --exclude-dir=.github \
+                   --exclude=PROVENANCE.md --exclude=LICENSE --exclude=README.md \
+                   --exclude=marketplace.json --exclude=plugin.json || true)
+          if [ -n "$HITS" ]; then
+            echo "::error::personal data outside allowed attribution files"; echo "$HITS"; exit 1
+          fi
+          echo "OK - skills are impersonal; name confined to attribution metadata"
+
+      - name: No real company names in worked examples
+        run: |
+          CO='(forvia|valeo|sanofi|doctolib|mirakl|contentsquare|artefact|loreal|l.oreal|danone|wavestone|accenture|rexel|pernod|kering|lvmh)'
+          if grep -rInEi "$CO" plugins/ examples/ ; then
+            echo "::error::real company name in a skill or example - anonymise it"; exit 1
+          fi
+          echo "OK - worked examples are anonymised"
+
+      # ------------------------------------------------------------------
+      # 4. Manifest and frontmatter validity.
+      # ------------------------------------------------------------------
+      - name: Validate manifests and skill frontmatter
+        run: |
+          python3 - <<'PY'
+          import json, glob, os, re, sys
+          fail = []
+
+          mp = json.load(open('.claude-plugin/marketplace.json'))
+          for k in ('name', 'owner', 'plugins'):
+              if k not in mp: fail.append(f'marketplace.json missing {k}')
+          if not re.fullmatch(r'[a-z0-9-]+', mp.get('name', '')):
+              fail.append('marketplace name must be kebab-case')
+
+          for p in mp['plugins']:
+              for k in ('name', 'source'):
+                  if k not in p: fail.append(f'plugin entry missing {k}')
+              src = p['source']
+              if isinstance(src, str):
+                  if not src.startswith('./'): fail.append(f'{p["name"]}: source must start with ./')
+                  if not os.path.isdir(src):   fail.append(f'{p["name"]}: source {src} does not exist')
+                  mf = os.path.join(src, '.claude-plugin', 'plugin.json')
+                  if not os.path.isfile(mf):   fail.append(f'{p["name"]}: missing plugin.json')
+                  else: json.load(open(mf))
+
+          names = set()
+          for f in glob.glob('plugins/*/skills/*/SKILL.md'):
+              t = open(f, encoding='utf-8').read()
+              m = re.match(r'^---\n(.*?)\n---\n', t, re.S)
+              if not m: fail.append(f'{f}: no YAML frontmatter'); continue
+              fm = m.group(1)
+              nm = re.search(r'^name:\s*(\S+)', fm, re.M)
+              ds = re.search(r'^description:\s*(.+)', fm, re.M)
+              if not nm: fail.append(f'{f}: frontmatter missing name')
+              if not ds: fail.append(f'{f}: frontmatter missing description')
+              if nm:
+                  n = nm.group(1)
+                  if n != os.path.basename(os.path.dirname(f)):
+                      fail.append(f'{f}: name "{n}" != directory name')
+                  if n in names: fail.append(f'duplicate skill name: {n}')
+                  names.add(n)
+              if ds and len(ds.group(1)) < 40:
+                  fail.append(f'{f}: description too short to trigger reliably')
+
+          if fail:
+              print('\n'.join('::error::' + x for x in fail)); sys.exit(1)
+          print(f'OK - {len(names)} skills, manifests valid: {sorted(names)}')
+          PY
+
+      - name: Required documents present
+        run: |
+          for f in README.md LICENSE SECURITY.md PROVENANCE.md CONTRIBUTING.md; do
+            [ -f "$f" ] || { echo "::error::missing $f"; exit 1; }
+          done
+          echo "OK - all required documents present"

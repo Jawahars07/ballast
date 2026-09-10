@@ -1,0 +1,106 @@
+%==============================================================================
+% One-page ATS-safe CV template
+%
+% Compile with:  tectonic cv-template.tex
+% NOT pdflatex. Tectonic runs shell-escape disabled and needs no TeX Live.
+%
+% Design rules — do not drift from these without a reason you can state:
+%   * single column, no tables in the body, no text boxes, no header/footer
+%   * standard section names only (Education / Experience / Projects / Skills)
+%   * greys only, so it survives a black-and-white print
+%   * hyperlinked contact row, never a bare URL as visible text
+%   * NEVER \uppercase inside titlesec — it breaks under tectonic. Use \scshape.
+%   * NEVER hidden, white, or zero-opacity text. ATS platforms flag it as fraud.
+%==============================================================================
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[left=1.4cm,right=1.4cm,top=1.2cm,bottom=1.2cm]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{ink}{HTML}{1A1A1A}
+\definecolor{mid}{HTML}{555555}
+\definecolor{rule}{HTML}{BBBBBB}
+\color{ink}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+
+\titleformat{\section}{\scshape\large}{}{0em}{}[\color{rule}\titlerule]
+\titlespacing*{\section}{0pt}{9pt}{5pt}
+
+\setlist[itemize]{leftmargin=1.1em,itemsep=1.5pt,topsep=3pt,parsep=0pt}
+
+% \role{Title}{Organisation}{Location}{Dates}
+\newcommand{\role}[4]{%
+  \vspace{3pt}\textbf{#1} \hfill \textcolor{mid}{#4}\\[1pt]
+  \textcolor{mid}{#2\ifx\relax#3\relax\else, #3\fi}\vspace{1pt}}
+
+%------------------------------------------------------------------ EDIT BELOW
+\newcommand{\FullName}{Your Name}
+\newcommand{\Tagline}{One concrete line about what you do. Not a list of adjectives.}
+\newcommand{\Email}{you@example.com}
+\newcommand{\Phone}{+00 0 00 00 00 00}
+\newcommand{\Site}{yoursite.com}
+\newcommand{\SiteURL}{https://yoursite.com}
+\newcommand{\GitHub}{github.com/you}
+\newcommand{\GitHubURL}{https://github.com/you}
+\newcommand{\LinkedIn}{linkedin.com/in/you}
+\newcommand{\LinkedInURL}{https://linkedin.com/in/you}
+%------------------------------------------------------------------------------
+
+\begin{document}
+
+{\Huge\scshape \FullName}\\[3pt]
+{\color{mid}\small
+  \href{mailto:\Email}{\Email} \textbf{·}
+  \Phone \textbf{·}
+  \href{\SiteURL}{\Site} \textbf{·}
+  \href{\GitHubURL}{\GitHub} \textbf{·}
+  \href{\LinkedInURL}{\LinkedIn}}\\[5pt]
+{\small \Tagline}
+
+\section{Education}
+\role{Degree, specialisation}{Institution}{City}{Sep 2024 -- Jun 2026}
+Relevant coursework: four or five modules that a reader of THIS job description would care
+about. Cut the rest.
+
+\role{Prior degree}{Institution}{City}{2020 -- 2024}
+
+\section{Experience}
+% Rhythm rule: at least ONE bullet per role must break the shape of the others.
+% Not every bullet opens with a past-tense verb. Lengths should visibly differ.
+\role{Job title}{Organisation}{City}{Jun 2024 -- Aug 2024}
+\begin{itemize}
+  \item Built the thing, and kept it running in production. Most of the work sat upstream:
+        finding the number that actually changed a decision, which is rarely the one people
+        ask for
+  \item Led delivery across N accounts, from mapping the process that existed to getting
+        people to use what replaced it
+  \item Automating our own reporting cut production time 40\%
+\end{itemize}
+
+\role{Earlier job title}{Organisation}{City}{Jan 2023 -- May 2023}
+\begin{itemize}
+  \item One honest line with a real, irregular number from facts.md. Not a rounded one
+  \item A second line that says why the work existed, or what was hard about it
+\end{itemize}
+
+\section{Projects}
+\textbf{Project name} \textcolor{mid}{— \href{https://example.com}{live}} \\
+What it does, in one sentence a non-specialist understands, plus the one result worth stating.
+Stack: the three tools that matter.
+
+\section{Skills}
+% This block IS a keyword list. That is correct here and not an AI tell.
+% Mirror the job description's exact wording — but only for things facts.md backs.
+\textbf{Languages \& tools:} Python, SQL, JavaScript, Git \\
+\textbf{Data:} the tools you have actually used \\
+\textbf{Languages:} English (C1), Other (A2) \hfill
+
+\end{document}

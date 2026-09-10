@@ -1,0 +1,43 @@
+# profile.yml — constraints and preferences. Not facts; facts live in facts.md.
+
+search:
+  target_roles:
+    - AI / GenAI adoption and enablement
+    - Digital transformation
+    - Data and analytics
+  contract_types: [apprenticeship, internship]
+  start_date: "2026-09"
+  preferred_duration_months: 24
+  # A shorter contract is a FLAG, never an automatic screen-out.
+  # Duration is deliberately not a hard gate. That call belongs to you.
+
+location:
+  base: "Paris, France"
+  zone: ["Paris", "Île-de-France"]
+  relocation: false
+  remote_ok: false
+  # Grant exceptions per role here, never by flipping `relocation` globally.
+  exceptions:
+    # - company: "Example Co"
+    #   reason: "fully remote, contract confirms no on-site requirement"
+    #   granted: "2026-09-01"
+
+languages:
+  # Must match facts.md exactly. jd-analyser gates against these.
+  english: C1
+  french: A1
+
+exclusions:
+  functions: [sales, BDR, pure heavy-coding IC engineering]
+  seniority: [senior, staff, principal, lead, director, head of]
+
+hard_gates:
+  degree_fields_not_held: [chemistry, biochemistry, pharmacy, law, design]
+  tools_without_evidence: [Adobe Photoshop, Adobe Illustrator, Salesforce, SAP, AutoCAD]
+
+verification:
+  # Nothing ships unverified. State the number, never "should be fine".
+  max_cv_pages: 1
+  require_ats_pass: true
+  require_human_voice_scan: true
+  require_every_claim_backed: true

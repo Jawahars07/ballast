@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "jawahar",
+  "description": "Judgement skills for Claude Code. Pure markdown, zero executable surface, 100% self-authored.",
+  "owner": {
+    "name": "Jawahar Naidu Nettem",
+    "url": "https://github.com/Jawahars07"
+  },
+  "plugins": [
+    {
+      "name": "career-forge",
+      "displayName": "Career Forge",
+      "source": "./plugins/career-forge",
+      "description": "Read a job description for what it actually requires, then build a CV and cover letter that only claim what you can prove. Six skills: requirement/responsibility separation, hard-gate screening, evidence-mapped scoring, LaTeX CV tailoring with ATS verification, AI-tell removal, and application pre-fill that never clicks Submit.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "author": { "name": "Jawahar Naidu Nettem", "url": "https://github.com/Jawahars07" },
+      "keywords": ["resume", "cv", "cover-letter", "job-search", "ats", "latex", "writing"]
+    },
+    {
+      "name": "ship-safe",
+      "displayName": "Ship Safe",
+      "source": "./plugins/ship-safe",
+      "description": "Two gates that run before something becomes irreversible: vet any third-party skill, plugin or package before installing it, and sweep a project for secrets and weaknesses before it goes public.",
+      "version": "1.0.0",
+      "category": "security",
+      "author": { "name": "Jawahar Naidu Nettem", "url": "https://github.com/Jawahars07" },
+      "keywords": ["security", "supply-chain", "vetting", "secrets", "open-source"]
+    },
+    {
+      "name": "deep-work",
+      "displayName": "Deep Work",
+      "source": "./plugins/deep-work",
+      "description": "Working discipline for tasks too big to hold in your head. A seven-phase protocol for heavy builds, a five-perspective decision council, and a session-close routine that stops your agent relearning the same thing every session.",
+      "version": "1.0.0",
+      "category": "workflow",
+      "author": { "name": "Jawahar Naidu Nettem", "url": "https://github.com/Jawahars07" },
+      "keywords": ["workflow", "agents", "planning", "decision-making", "memory"]
+    }
+  ]
+}

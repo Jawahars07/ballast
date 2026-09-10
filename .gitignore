@@ -1,0 +1,11 @@
+.DS_Store
+*.pdf
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+node_modules/
+.env
+.env.*
+!.env.example

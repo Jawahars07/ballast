@@ -1,0 +1,65 @@
+%==============================================================================
+% Cover letter — visually matched to cv-template.tex
+% Compile with:  tectonic cover-letter-template.tex
+%
+% Voice rules live in the human-voice skill, Part 1. Load it before writing.
+% Short sentences. No "I am writing to express my keen interest". No em-dashes.
+% One ask. Say the real reason.
+%==============================================================================
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[left=2.2cm,right=2.2cm,top=1.8cm,bottom=1.8cm]{geometry}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+
+\definecolor{ink}{HTML}{1A1A1A}
+\definecolor{mid}{HTML}{555555}
+\definecolor{rule}{HTML}{BBBBBB}
+\color{ink}
+
+\pagestyle{empty}
+\linespread{1.06}
+
+\newcommand{\FullName}{Your Name}
+\newcommand{\Email}{you@example.com}
+\newcommand{\Phone}{+00 0 00 00 00 00}
+\newcommand{\Site}{yoursite.com}
+\newcommand{\SiteURL}{https://yoursite.com}
+
+\begin{document}
+
+{\Huge\scshape \FullName}\\[3pt]
+{\color{mid}\small
+  \href{mailto:\Email}{\Email} \textbf{·} \Phone \textbf{·}
+  \href{\SiteURL}{\Site}}\\[4pt]
+{\color{rule}\hrule}
+\vspace{10pt}
+
+{\color{mid}\small Company name · City · \today}
+\vspace{10pt}
+
+Dear Hiring Team,
+
+% Line one does the work. State the specific thing in the job description that
+% matches something you have genuinely done. No throat-clearing.
+Opening line that gets to the point immediately.
+
+% Paragraph 2: the strongest EXCEEDS/MEETS item from the jd-analyser brief,
+% told as one concrete story with the real number from facts.md.
+Second paragraph.
+
+% Paragraph 3: the second proof point, or why this company specifically.
+% The real reason, not the flattering one.
+Third paragraph.
+
+% Paragraph 4: one ask, low friction.
+Closing paragraph with a single, easy yes.
+
+\vspace{8pt}
+\FullName
+
+\end{document}
