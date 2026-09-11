@@ -1,18 +1,23 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "ballast",
-  "description": "Ballast doesn't make the ship faster. It stops it going over. Claude Code skills that encode when NOT to do something. Pure markdown, zero executable surface, 100% self-authored.",
+  "description": "Ballast doesn't make the ship faster. It stops it going over. Agent skills that encode when NOT to do something. Pure markdown, zero executable surface, 100% self-authored.",
   "owner": {
     "name": "Jawahar Naidu Nettem",
     "url": "https://github.com/Jawahars07"
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "license": "MIT",
+    "homepage": "https://github.com/Jawahars07/ballast"
   },
   "plugins": [
     {
       "name": "career-forge",
       "displayName": "Career Forge",
-      "source": "./plugins/career-forge",
-      "description": "Read a job description for what it actually requires, then build a CV and cover letter that only claim what you can prove. Six skills: requirement/responsibility separation, hard-gate screening, evidence-mapped scoring, LaTeX CV tailoring with ATS verification, AI-tell removal, and application pre-fill that never clicks Submit.",
+      "source": "./",
       "version": "1.0.0",
+      "description": "Read a job description for what it actually requires, then build a CV and cover letter that only claim what you can prove. Requirement/responsibility separation, hard-gate screening, evidence-mapped scoring, LaTeX CV tailoring with ATS verification, AI-tell removal, and application pre-fill that never clicks Submit.",
       "category": "productivity",
       "author": {
         "name": "Jawahar Naidu Nettem",
@@ -26,14 +31,22 @@
         "ats",
         "latex",
         "writing"
+      ],
+      "skills": [
+        "./skills/jd-analyser",
+        "./skills/human-voice",
+        "./skills/cv-tailor",
+        "./skills/application-package",
+        "./skills/job-triage",
+        "./skills/apply-prefill"
       ]
     },
     {
       "name": "ship-safe",
       "displayName": "Ship Safe",
-      "source": "./plugins/ship-safe",
-      "description": "Two gates that run before something becomes irreversible: vet any third-party skill, plugin or package before installing it, and sweep a project for secrets and weaknesses before it goes public.",
+      "source": "./",
       "version": "1.0.0",
+      "description": "Two gates that run before something becomes irreversible: vet any third-party skill, plugin or package before installing it, and sweep a project for secrets and weaknesses before it goes public.",
       "category": "security",
       "author": {
         "name": "Jawahar Naidu Nettem",
@@ -45,14 +58,18 @@
         "vetting",
         "secrets",
         "open-source"
+      ],
+      "skills": [
+        "./skills/security-vet",
+        "./skills/github-publish"
       ]
     },
     {
       "name": "deep-work",
       "displayName": "Deep Work",
-      "source": "./plugins/deep-work",
-      "description": "Working discipline for tasks too big to hold in your head. A seven-phase protocol for heavy builds, a five-perspective decision council, and a session-close routine that stops your agent relearning the same thing every session.",
+      "source": "./",
       "version": "1.0.0",
+      "description": "Working discipline for tasks too big to hold in your head. A seven-phase protocol for heavy builds, a five-perspective decision council, and a session-close routine that stops your agent relearning the same thing every session.",
       "category": "workflow",
       "author": {
         "name": "Jawahar Naidu Nettem",
@@ -64,6 +81,11 @@
         "planning",
         "decision-making",
         "memory"
+      ],
+      "skills": [
+        "./skills/heavy-build-protocol",
+        "./skills/council",
+        "./skills/wiki-sync"
       ]
     }
   ]

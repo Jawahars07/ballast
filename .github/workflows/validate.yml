@@ -2,9 +2,11 @@ name: validate
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
+# Least privilege: this workflow only ever reads the repository.
 permissions:
   contents: read
 
@@ -12,43 +14,58 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # Pinned to a full commit SHA, not a moving tag. A tag can be repointed;
+      # a SHA cannot. This is the same rule security-vet applies to anything
+      # third-party, so it applies here too.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
 
       # ------------------------------------------------------------------
-      # 1. No executable surface inside any plugin.
-      #    Skills are markdown and inert assets. Nothing that can run on
-      #    install may enter plugins/.
+      # 1. Zero executable surface. This is the repository's core claim and
+      #    the reason it can be audited by reading it. Nothing that can run
+      #    on install may enter skills/.
       # ------------------------------------------------------------------
-      - name: No executable files in plugins/
+      - name: No executable files in skills/
         run: |
-          BAD=$(find plugins -type f \
+          BAD=$(find skills -type f \
             \( -name '*.sh'  -o -name '*.js'  -o -name '*.mjs' -o -name '*.cjs' \
             -o -name '*.py'  -o -name '*.rb'  -o -name '*.pl'  -o -name '*.bat' \
-            -o -name '*.ps1' -o -name '*.exe' -o -name '*.bin' \) )
-          EXECBIT=$(find plugins -type f -perm -u+x)
-          if [ -n "$BAD$EXECBIT" ]; then
-            echo "::error::executable surface found inside plugins/"
-            echo "$BAD"; echo "$EXECBIT"; exit 1
+            -o -name '*.ps1' -o -name '*.exe' -o -name '*.bin' -o -name '*.dll' \
+            -o -name '*.dylib' -o -name '*.so' \))
+          EXECBIT=$(find skills -type f -perm -u+x)
+          SYMLINK=$(find skills -type l)
+          if [ -n "$BAD$EXECBIT$SYMLINK" ]; then
+            echo "::error::executable surface or symlink found inside skills/"
+            echo "$BAD"; echo "$EXECBIT"; echo "$SYMLINK"; exit 1
           fi
-          echo "OK - plugins/ contains no scripts and no executable bits"
+          echo "OK - skills/ contains no scripts, no executable bits, no symlinks"
 
-      - name: No package manifests or lockfiles in plugins/
+      - name: Only inert file types in skills/
         run: |
-          BAD=$(find plugins -type f \( -name 'package.json' -o -name 'package-lock.json' \
-            -o -name 'requirements.txt' -o -name 'pyproject.toml' -o -name 'Gemfile' \))
+          BAD=$(find skills -type f ! -name '*.md' ! -name '*.tex' ! -name '*.json' \
+                 ! -name '*.yml' ! -name '*.yaml' ! -name '*.txt' ! -name '*.csv')
           if [ -n "$BAD" ]; then
-            echo "::error::dependency manifest found inside plugins/"; echo "$BAD"; exit 1
+            echo "::error::unexpected file type in skills/"; echo "$BAD"; exit 1
+          fi
+          echo "OK - skills/ holds only inert, human-readable file types"
+
+      - name: No package manifests or lockfiles
+        run: |
+          BAD=$(find skills -type f \( -name 'package.json' -o -name 'package-lock.json' \
+            -o -name 'requirements.txt' -o -name 'pyproject.toml' -o -name 'Gemfile' \
+            -o -name 'Cargo.toml' -o -name 'go.mod' \))
+          if [ -n "$BAD" ]; then
+            echo "::error::dependency manifest found inside skills/"; echo "$BAD"; exit 1
           fi
           echo "OK - no dependency manifests, nothing to install"
 
       # ------------------------------------------------------------------
-      # 2. Secrets. Working tree and full git history.
+      # 2. Secrets, in the working tree and across all history.
       # ------------------------------------------------------------------
       - name: Secret scan
         run: |
-          PAT='(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{22,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'
+          PAT='(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{22,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'
           if grep -rInE "$PAT" . --exclude-dir=.git --exclude-dir=.github ; then
             echo "::error::secret pattern in working tree"; exit 1
           fi
@@ -66,33 +83,35 @@ jobs:
           PII='(nettem|jawaharnaidu|essec|rta.living|anantapur|pandaece|pocketlite|adopt-eight|ohara/wiki|career-ops/|france.travail|[+]33[0-9 ]{9,}|10532003194)'
 
           # (a) Skills must be impersonal. The author's name may appear in
-          #     attribution metadata, never inside a skill a stranger will run.
-          if grep -rInEi "$PII" plugins/ examples/ --include='*.md' --include='*.tex' ; then
+          #     attribution metadata, never inside a skill a stranger runs.
+          if grep -rInEi "$PII" skills/ examples/ ; then
             echo "::error::personal data inside a skill or example"; exit 1
           fi
 
-          # (b) Everywhere else, only these files may carry the author's name.
+          # (b) Elsewhere, only these files may carry the author's name.
           HITS=$(grep -rIlEi "$PII" . \
                    --exclude-dir=.git --exclude-dir=.github \
                    --exclude=PROVENANCE.md --exclude=LICENSE --exclude=README.md \
-                   --exclude=marketplace.json --exclude=plugin.json || true)
+                   --exclude=CHANGELOG.md --exclude=CITATION.cff \
+                   --exclude=CODE_OF_CONDUCT.md --exclude=CODEOWNERS \
+                   --exclude=marketplace.json || true)
           if [ -n "$HITS" ]; then
             echo "::error::personal data outside allowed attribution files"; echo "$HITS"; exit 1
           fi
-          echo "OK - skills are impersonal; name confined to attribution metadata"
+          echo "OK - skills impersonal; name confined to attribution metadata"
 
       - name: No real company names in worked examples
         run: |
           CO='(forvia|valeo|sanofi|doctolib|mirakl|contentsquare|artefact|loreal|l.oreal|danone|wavestone|accenture|rexel|pernod|kering|lvmh)'
-          if grep -rInEi "$CO" plugins/ examples/ ; then
+          if grep -rInEi "$CO" skills/ examples/ ; then
             echo "::error::real company name in a skill or example - anonymise it"; exit 1
           fi
           echo "OK - worked examples are anonymised"
 
       # ------------------------------------------------------------------
-      # 4. Manifest and frontmatter validity.
+      # 4. Conformance: Agent Skills open standard + Claude marketplace.
       # ------------------------------------------------------------------
-      - name: Validate manifests and skill frontmatter
+      - name: Validate manifest and SKILL.md conformance
         run: |
           python3 - <<'PY'
           import json, glob, os, re, sys
@@ -104,44 +123,66 @@ jobs:
           if not re.fullmatch(r'[a-z0-9-]+', mp.get('name', '')):
               fail.append('marketplace name must be kebab-case')
 
+          on_disk = {os.path.basename(os.path.dirname(f))
+                     for f in glob.glob('skills/*/SKILL.md')}
+          listed = set()
           for p in mp['plugins']:
-              for k in ('name', 'source'):
+              for k in ('name', 'source', 'description'):
                   if k not in p: fail.append(f'plugin entry missing {k}')
-              src = p['source']
-              if isinstance(src, str):
-                  if not src.startswith('./'): fail.append(f'{p["name"]}: source must start with ./')
-                  if not os.path.isdir(src):   fail.append(f'{p["name"]}: source {src} does not exist')
-                  mf = os.path.join(src, '.claude-plugin', 'plugin.json')
-                  if not os.path.isfile(mf):   fail.append(f'{p["name"]}: missing plugin.json')
-                  else: json.load(open(mf))
+              if p.get('source') != './':
+                  fail.append(f'{p["name"]}: source must be "./" for the flat layout')
+              for s in p.get('skills', []):
+                  if not s.startswith('./skills/'):
+                      fail.append(f'{p["name"]}: skill path must start ./skills/ -> {s}')
+                  if not os.path.isfile(os.path.join(s, 'SKILL.md')):
+                      fail.append(f'{p["name"]}: {s}/SKILL.md does not exist')
+                  listed.add(os.path.basename(s))
 
-          names = set()
-          for f in glob.glob('plugins/*/skills/*/SKILL.md'):
+          # every skill on disk must be reachable through some plugin
+          for orphan in sorted(on_disk - listed):
+              fail.append(f'skill "{orphan}" exists on disk but no plugin lists it')
+
+          # Agent Skills open standard: folder + SKILL.md with name + description
+          for f in sorted(glob.glob('skills/*/SKILL.md')):
+              d = os.path.basename(os.path.dirname(f))
               t = open(f, encoding='utf-8').read()
               m = re.match(r'^---\n(.*?)\n---\n', t, re.S)
-              if not m: fail.append(f'{f}: no YAML frontmatter'); continue
+              if not m:
+                  fail.append(f'{f}: no YAML frontmatter'); continue
               fm = m.group(1)
               nm = re.search(r'^name:\s*(\S+)', fm, re.M)
               ds = re.search(r'^description:\s*(.+)', fm, re.M)
-              if not nm: fail.append(f'{f}: frontmatter missing name')
-              if not ds: fail.append(f'{f}: frontmatter missing description')
-              if nm:
-                  n = nm.group(1)
-                  if n != os.path.basename(os.path.dirname(f)):
-                      fail.append(f'{f}: name "{n}" != directory name')
-                  if n in names: fail.append(f'duplicate skill name: {n}')
-                  names.add(n)
+              if not nm: fail.append(f'{f}: frontmatter missing required "name"')
+              if not ds: fail.append(f'{f}: frontmatter missing required "description"')
+              if nm and nm.group(1) != d:
+                  fail.append(f'{f}: name "{nm.group(1)}" != directory "{d}"')
+              if nm and not re.fullmatch(r'[a-z0-9-]+', nm.group(1)):
+                  fail.append(f'{f}: name must be kebab-case')
               if ds and len(ds.group(1)) < 40:
                   fail.append(f'{f}: description too short to trigger reliably')
 
           if fail:
               print('\n'.join('::error::' + x for x in fail)); sys.exit(1)
-          print(f'OK - {len(names)} skills, manifests valid: {sorted(names)}')
+          print(f'OK - {len(on_disk)} skills conform to the Agent Skills standard '
+                f'and are all reachable from {len(mp["plugins"])} plugins')
           PY
 
-      - name: Required documents present
+      - name: Required community documents present
         run: |
-          for f in README.md LICENSE SECURITY.md PROVENANCE.md CONTRIBUTING.md; do
+          for f in README.md LICENSE SECURITY.md PROVENANCE.md CONTRIBUTING.md \
+                   CODE_OF_CONDUCT.md CHANGELOG.md CITATION.cff; do
             [ -f "$f" ] || { echo "::error::missing $f"; exit 1; }
           done
-          echo "OK - all required documents present"
+          echo "OK - all community health files present"
+
+      - name: Links in README resolve to real files
+        run: |
+          python3 - <<'PY'
+          import re, os, sys
+          # Skip pure in-page anchors like (#install); they have no path part.
+          bad = [t for t in re.findall(r'\]\(([^)h][^)]*)\)', open('README.md').read())
+                 if t.split('#')[0] and not os.path.exists(t.split('#')[0])]
+          if bad:
+              print('\n'.join(f'::error::README links to missing path: {b}' for b in bad)); sys.exit(1)
+          print('OK - all relative README links resolve')
+          PY

@@ -1,0 +1,47 @@
+name: A skill gave wrong output
+description: A skill followed its own rules and still produced something wrong
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        These skills are instructions, so a bug is usually a rule that is missing,
+        ambiguous, or wrong. The most useful report shows the input and the output.
+
+        **Do not paste your real CV, your facts.md, or a real job posting.** Redact
+        it or reconstruct a minimal version. Issues are public and permanent.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Which skill
+      options:
+        - jd-analyser
+        - human-voice
+        - cv-tailor
+        - application-package
+        - job-triage
+        - apply-prefill
+        - security-vet
+        - github-publish
+        - heavy-build-protocol
+        - council
+        - wiki-sync
+    validations: {required: true}
+  - type: input
+    id: tool
+    attributes:
+      label: Which agent tool and version
+      placeholder: "Claude Code 2.1, Codex CLI, Cursor, Gemini CLI..."
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what you got
+      description: Quote the rule you think should have applied.
+    validations: {required: true}
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal input that reproduces it
+      description: Redacted or reconstructed. Never real personal data.
+    validations: {required: true}

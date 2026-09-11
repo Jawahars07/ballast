@@ -9,11 +9,22 @@ any plugin. There is nothing to `npm install`. There is no postinstall step, bec
 install step at all beyond copying files.
 
 This is enforced in CI, not just promised. `.github/workflows/validate.yml` fails the build if
-any executable file, any executable bit, or any dependency manifest appears under `plugins/`.
+any executable file, any executable bit, any symlink, any unexpected file type, or any
+dependency manifest appears under `skills/`. GitHub Actions are pinned to full commit SHAs
+rather than moving tags, and the workflow runs with `contents: read` and nothing more.
 
 The only scripts in this repository are the GitHub Actions workflows themselves. Those run on
 GitHub's infrastructure when the repository is built. They are never installed on your machine
 and are not part of any plugin.
+
+## Portability
+
+These skills follow the [Agent Skills open standard](https://agentskills.io) and are plain
+folders containing a `SKILL.md`. They carry no tool-specific code, so the same files behave the
+same way in Claude Code, Codex, Cursor, Gemini CLI and every other conforming tool.
+
+That also means the audit below is complete for every platform. There is no per-tool variant
+with different behaviour.
 
 ## What each plugin can and cannot do
 
@@ -55,10 +66,10 @@ find plugins -type f | xargs file
 find plugins -type f -perm -u+x
 
 # every URL any skill could reach
-grep -rInE 'https?://' plugins/
+grep -rInE 'https?://' skills/
 
 # every command any skill tells your agent to run
-grep -rInE '^\s*(tectonic|pdftotext|pdfinfo|grep|git|find|awk|curl|wget|npm|pip)' plugins/
+grep -rInE '^\s*(tectonic|pdftotext|pdfinfo|grep|git|find|awk|curl|wget|npm|pip)' skills/
 ```
 
 Then read the SKILL.md files. They are prose. That is the whole point — you can audit an agent

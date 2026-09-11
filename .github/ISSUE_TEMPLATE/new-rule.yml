@@ -1,0 +1,31 @@
+name: Propose a rule or a skill
+description: Suggest a new rule in an existing skill, or a new skill entirely
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every rule in this repository traces to something that actually went wrong.
+        The bar is a real failure, not a better practice in the abstract.
+
+        "This would be more correct" is not enough.
+        "This produced a wrong output, here is the case" is.
+  - type: textarea
+    id: failure
+    attributes:
+      label: What went wrong
+      description: The concrete case. What was the input, what did the agent do, why was it wrong?
+    validations: {required: true}
+  - type: textarea
+    id: rule
+    attributes:
+      label: The rule that would have prevented it
+      description: Write it as you would want it to appear in the skill.
+    validations: {required: true}
+  - type: textarea
+    id: cost
+    attributes:
+      label: What does this rule cost
+      description: >
+        Every rule makes the agent more cautious, and some of that caution is wasted.
+        What does this one make harder or slower? An honest answer here helps a lot.

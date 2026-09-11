@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+title: "Ballast: agent skills that encode when not to do something"
+message: "If you use these skills or build on them, please cite this repository."
+type: software
+authors:
+  - given-names: "Jawahar Naidu"
+    family-names: "Nettem"
+    orcid: ""
+repository-code: "https://github.com/Jawahars07/ballast"
+url: "https://github.com/Jawahars07/ballast"
+abstract: >-
+  Eleven self-authored agent skills for Claude Code and any tool implementing the
+  Agent Skills open standard. Where most skills add a capability, these add a
+  check: separating what a job description requires from what it merely describes,
+  removing the lexical and structural markers of machine-written text, vetting
+  third-party code before installation, sweeping a repository before it goes
+  public, and enforcing a verification phase in long-running builds. Distributed
+  as pure markdown with no executable surface, so the whole corpus can be audited
+  by reading it.
+keywords:
+  - agent-skills
+  - claude-code
+  - ai-agents
+  - prompt-engineering
+  - resume
+  - applicant-tracking-system
+  - supply-chain-security
+license: MIT
+version: 1.0.0
+date-released: "2026-09-11"

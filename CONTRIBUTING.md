@@ -13,9 +13,12 @@ is.
 
 ## What will be rejected
 
-- **Any executable file inside `plugins/`.** Scripts, binaries, dependency manifests. CI blocks
-  these, and the block is deliberate — the security story of this repository is that there is
-  nothing to run. Solve it with inline shell inside the skill markdown instead.
+- **Any executable file, symlink, or dependency manifest inside `skills/`.** CI blocks these,
+  and the block is deliberate: the security story of this repository is that there is nothing
+  to run. Solve it with inline shell inside the skill markdown instead, the way `human-voice`
+  and `cv-tailor` do.
+- **Anything tool-specific.** These are portable Agent Skills. A rule that only works in one
+  agent belongs in that agent's own config, not here.
 - **Anything that sends user data anywhere.** These skills read local files. That is the deal.
 - **A copy of someone else's skill.** See `PROVENANCE.md`. If you have written something good,
   publish it under your own name and I will link to it.
@@ -40,7 +43,7 @@ Skills are prose, written for a model that will follow them literally.
 ```bash
 # the same checks CI runs
 find plugins -type f -perm -u+x                  # must be empty
-grep -rInE 'https?://' plugins/                  # every URL must be justified
+grep -rInE 'https?://' skills/                  # every URL must be justified
 python3 -c "import json;json.load(open('.claude-plugin/marketplace.json'))"
 ```
 

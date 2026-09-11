@@ -2,17 +2,22 @@
 
 **Ballast doesn't make the ship faster. It stops it going over.**
 
-Eleven skills for Claude Code that encode **when not to do something**.
+Eleven agent skills that encode **when not to do something**.
+
+[![validate](https://github.com/Jawahars07/ballast/actions/workflows/validate.yml/badge.svg)](https://github.com/Jawahars07/ballast/actions/workflows/validate.yml)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-open%20standard-000)](https://agentskills.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Zero executable surface](https://img.shields.io/badge/executable%20surface-zero-brightgreen)](SECURITY.md)
+[![Self-authored](https://img.shields.io/badge/provenance-100%25%20self--authored-blueviolet)](PROVENANCE.md)
 
 Most agent skills add a capability. These add a check. Each one exists because I did something
 wrong, and the rule is what stopped it happening twice.
 
-```
-/plugin marketplace add Jawahars07/ballast
-/plugin install career-forge@ballast
-```
+They follow the [Agent Skills open standard](https://agentskills.io), so they work in Claude
+Code, Codex, Cursor, Gemini CLI, Copilot, OpenCode, Goose and ~40 other tools. **Install takes
+one command** — see [Install](#install).
 
-**Pure markdown. No scripts, no dependencies, no network calls, nothing to install.**
+**Pure markdown. No scripts, no dependencies, no network calls, nothing to execute.**
 [Enforced in CI](.github/workflows/validate.yml), not just promised. See [SECURITY.md](SECURITY.md).
 
 ---
@@ -88,27 +93,99 @@ Yes, you should run `security-vet` on this repository. That is the intended use.
 
 ---
 
-## Setup
+## Install
 
-`career-forge` reads two files you own. Nothing works without them, and that is deliberate — it
-is what makes fabrication structurally impossible rather than merely discouraged.
+### Any tool that supports the Agent Skills standard
+
+The standard location is `~/.agents/skills/`. Tools discover skills there automatically.
+
+```bash
+git clone https://github.com/Jawahars07/ballast.git
+mkdir -p ~/.agents/skills
+cp -R ballast/skills/* ~/.agents/skills/
+```
+
+To scope it to one project instead of your whole machine, use the repo-level location:
+
+```bash
+mkdir -p .agents/skills && cp -R /path/to/ballast/skills/* .agents/skills/
+```
+
+Prefer `cp` over a symlink. Some tools do not follow symlinks, and copying means you can read
+exactly what you installed.
+
+### Claude Code
+
+As a plugin marketplace, which keeps the three plugins separate and updatable:
+
+```
+/plugin marketplace add Jawahars07/ballast
+/plugin install career-forge@ballast
+/plugin install ship-safe@ballast
+/plugin install deep-work@ballast
+```
+
+Or drop the skills in directly:
+
+```bash
+cp -R ballast/skills/* ~/.claude/skills/
+```
+
+### Per-tool notes
+
+| Tool | Reads |
+|---|---|
+| **Claude Code** | the marketplace above, or `~/.claude/skills/` · [docs](https://code.claude.com/docs/en/skills) |
+| **Codex CLI** | `.agents/skills/` (repo) then `~/.agents/skills/` (user) · [docs](https://developers.openai.com/codex/skills/) |
+| **Cursor** | [docs](https://cursor.com/docs/context/skills) |
+| **Gemini CLI** | [docs](https://geminicli.com/docs/cli/skills/) |
+| **GitHub Copilot / VS Code** | [docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) |
+| **OpenCode** | [docs](https://opencode.ai/docs/skills/) |
+| **Goose** | [docs](https://block.github.io/goose/docs/guides/context-engineering/using-skills/) |
+| **Factory Droid** | [docs](https://docs.factory.ai/cli/configuration/skills) |
+| **OpenClaw** | [docs](https://docs.openclaw.ai/tools/skills) |
+| **Kiro, Amp, Roo Code, Letta, Trae, and ~30 more** | [full client list](https://agentskills.io/clients) |
+
+I have verified the `~/.agents/skills/` path and the Claude Code paths myself. For the rest, the
+linked docs are authoritative — if your tool puts skills somewhere else, follow its
+documentation rather than this table, and please open an issue so I can correct it.
+
+### Take only what you want
+
+Each skill is a self-contained folder. There is no shared code, so copying one directory works:
+
+```bash
+cp -R ballast/skills/jd-analyser ~/.agents/skills/
+```
+
+### Then, for `career-forge` only
+
+The career skills read two files you own. Nothing works without them, and that is deliberate —
+it is what makes fabrication structurally impossible rather than merely discouraged.
 
 ```bash
 cp examples/facts.md examples/profile.yml examples/applications.tsv .
 ```
 
-Then fill `facts.md` with things that are true. Its **Evidence Index** is binding: a skill marked
+Fill `facts.md` with things that are true. Its **Evidence Index** is binding: a skill marked
 *never claim* never appears in a document, no matter what a posting asks for.
 
-`cv-tailor` additionally needs `tectonic` and `pdftotext`:
+`cv-tailor` additionally needs two binaries:
 
 ```bash
-brew install tectonic poppler
+brew install tectonic poppler        # macOS
 ```
 
-`ship-safe` and `deep-work` need nothing.
+`ship-safe` and `deep-work` need nothing at all.
 
----
+### Updating
+
+```bash
+cd ballast && git pull && cp -R skills/* ~/.agents/skills/
+```
+
+Pin to a release tag rather than tracking `main` if you would rather audit once and freeze:
+`git checkout v1.0.0`.
 
 ## Provenance
 

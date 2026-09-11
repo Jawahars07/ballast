@@ -1,0 +1,15 @@
+# This project ships no runtime dependencies - skills are markdown.
+# The only thing with a supply chain is the CI workflow itself, so that is
+# what Dependabot watches. Actions are pinned to commit SHAs; Dependabot
+# understands SHA pins and will open a PR with the new SHA and its tag.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
