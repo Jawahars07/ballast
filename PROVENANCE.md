@@ -3,8 +3,13 @@
 ## Everything here is self-authored
 
 All eleven skills in this repository were written by me, Jawahar Naidu Nettem, for my own daily
-use, before any of it was intended for publication. None of it is a fork, a rename, or a
-lightly-edited copy of someone else's skill.
+use, before any of it was intended for publication. None of it is a fork, a re-badged copy, or a
+lightly-edited version of someone else's skill.
+
+Three carry a different name here than they do in my own workspace, so that the namespace reads
+clearly to someone who has never seen it: `fable-protocol` became `heavy-build-protocol`,
+`career-latex-documents` became `cv-tailor`, and `auto-apply` became `apply-prefill`. Same
+author, same skill, clearer name.
 
 Each one exists because something went wrong and needed a rule. Most of the "mistakes that have
 actually happened" sections are literal — those are my mistakes, generalised.

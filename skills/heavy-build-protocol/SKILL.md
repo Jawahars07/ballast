@@ -1,6 +1,6 @@
 ---
 name: heavy-build-protocol
-description: The working discipline for heavy tasks - building agents or systems, multi-hour features, large refactors, complex debugging. A seven-phase loop with a verification requirement in every phase and a single approval gate before anything irreversible. Load it BEFORE starting any task expected to take more than about ten tool calls.
+description: The working discipline for heavy tasks - building agents or systems, multi-hour features, large refactors, complex debugging. An eight-phase loop numbered from zero, with a verification requirement in every phase and a single approval gate before anything irreversible. Load it BEFORE starting any task expected to take more than about ten tool calls.
 ---
 
 # Heavy Build Protocol
@@ -10,7 +10,10 @@ Capability differs between models. Discipline transfers.
 Follow this loop and you get work that is evidence-grounded, verified, and honestly reported.
 Skip phases and you reproduce the failures that made each phase necessary.
 
-## The loop — seven phases, never skip one
+## The loop — eight phases, never skip one
+
+Numbered from zero, because phase 0 happens **before the first tool call**. If you find yourself
+already running commands, you skipped it.
 
 ### 0. FRAME — before any tool call
 

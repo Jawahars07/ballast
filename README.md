@@ -80,7 +80,7 @@ Yes, you should run `security-vet` on this repository. That is the intended use.
 
 | Skill | What it does |
 |---|---|
-| **`heavy-build-protocol`** | Seven phases: **frame · recon · plan · gate · build · verify · report · log**. Phase 0 requires you to name the observable check *before* the first tool call. If you cannot name it, you do not understand the task yet |
+| **`heavy-build-protocol`** | Eight phases, numbered from zero: **frame · recon · plan · gate · build · verify · report · log**. Phase 0 happens before the first tool call and requires you to name the observable check. If you cannot name it, you do not understand the task yet |
 | **`council`** | Five advisors — strategy, execution, finance, risk, contrarian — run in parallel, get **anonymised and shuffled**, then a judge synthesises. "Divided" is a valid verdict and is never manufactured away |
 | **`wiki-sync`** | Session close. Writes the *lesson*, not the changelog, into a markdown knowledge base so the next session starts informed |
 
@@ -189,7 +189,10 @@ Pin to a release tag rather than tracking `main` if you would rather audit once 
 
 ## Provenance
 
-**All eleven skills are mine.** No forks, no renames, no lightly-edited copies.
+**All eleven skills are mine.** None is a fork, a re-badged copy, or a lightly-edited version
+of someone else's work. Three were renamed from their private names when published, for a
+namespace a stranger can read: `fable-protocol` became `heavy-build-protocol`,
+`career-latex-documents` became `cv-tailor`, and `auto-apply` became `apply-prefill`.
 
 [PROVENANCE.md](PROVENANCE.md) also lists the third-party skills I use daily and **deliberately
 did not republish**, with credit to their authors. While writing it I found one skill recorded in
