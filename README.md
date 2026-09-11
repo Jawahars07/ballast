@@ -1,4 +1,6 @@
-# Claude Skills — judgement, not tooling
+# Ballast
+
+**Ballast doesn't make the ship faster. It stops it going over.**
 
 Eleven skills for Claude Code that encode **when not to do something**.
 
@@ -6,8 +8,8 @@ Most agent skills add a capability. These add a check. Each one exists because I
 wrong, and the rule is what stopped it happening twice.
 
 ```
-/plugin marketplace add Jawahars07/claude-skills
-/plugin install career-forge@jawahar
+/plugin marketplace add Jawahars07/ballast
+/plugin install career-forge@ballast
 ```
 
 **Pure markdown. No scripts, no dependencies, no network calls, nothing to install.**
@@ -136,6 +138,14 @@ people's.
   guiding a human click by click.
 
 ---
+
+## The name
+
+Ballast is dead weight you carry on purpose. It adds nothing to top speed and it costs you
+cargo space, and without it the first serious crosswind puts the mast in the water.
+
+That is what these skills are. None of them make an agent more capable. Every one of them makes
+it harder to do the confident, fast, wrong thing.
 
 MIT licensed. Built in Paris. Issues and PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
 

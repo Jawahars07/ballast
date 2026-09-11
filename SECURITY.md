@@ -45,8 +45,8 @@ using it.
 Do not take the table above on faith. It is a small repository and you can check it in a minute:
 
 ```bash
-git clone https://github.com/Jawahars07/claude-skills
-cd claude-skills
+git clone https://github.com/Jawahars07/ballast
+cd ballast
 
 # every file that ships in a plugin, and its type
 find plugins -type f | xargs file
@@ -70,7 +70,7 @@ Pin to a tag rather than tracking `main`, so a future commit cannot change what 
 audited:
 
 ```
-/plugin marketplace add Jawahars07/claude-skills
+/plugin marketplace add Jawahars07/ballast
 ```
 
 Then check what you have against a release tag. If you want a stronger guarantee, fork the
