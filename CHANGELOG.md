@@ -11,6 +11,20 @@ examples, and corrections.
 
 ## [Unreleased]
 
+### Added
+
+- **`job-triage` gains a mission-block screen.** Two categories that no stated requirement
+  catches, and that no CV can work around: **authorship as the deliverable** (editorial copy,
+  newsletters, white papers, press relations) and **design tooling as the deliverable**
+  (infographics, high-fidelity mockups, design systems, video editing). These are read from the
+  *mission* block rather than the requirements block, which is a deliberate and deliberately
+  narrow exception to the rule that responsibilities are never requirements: the question is not
+  "can this candidate be hired" but "could they do the day job at all". One posting that stated
+  no language requirement whatsoever was still unbuildable because the deliverable was editorial
+  copy in a language the candidate does not write.
+- **`job-triage` gains a portfolio gate** — a required portfolio, book, or prior placement in a
+  craft the candidate has never practised.
+
 ### Changed
 
 - **`jd-analyser` now returns two scores instead of one.** The single score measured only

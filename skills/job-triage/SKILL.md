@@ -44,9 +44,29 @@ Apply `jd-analyser`'s hard gates:
 | Specialised school | Names a school type they are not in, as an exclusive |
 | Stated language | "fluent French", "proficiency in X", "bilingual" above their level |
 | Hard tool bar | A named tool listed as *required* with no evidence in `facts.md` |
+| Portfolio requirement | A required portfolio, book, or prior placement in a craft the candidate has not done |
 | Location | Outside the zone with no exception granted |
 
-**A gate hit means the role does not enter the digest.** Log it under a `Screened out` section
+### The mission-block screen
+
+Two things are **not** gates, because nothing is stated, and still make a role unbuildable. For
+these, read the **missions** — and read them only as a description of the day job, never as an
+inferred requirement.
+
+| Screen | Kill signal in the MISSION block | Why |
+|---|---|---|
+| **Authorship as the deliverable** | "write articles, newsletters, white papers", "editorial content", "SEO copy", "press relations", "editorial calendar" | The job *is* producing polished copy in a language the candidate does not write at that level. No CV craft closes that |
+| **Design tooling as the deliverable** | "infographics", "banners", "high-fidelity mockups", "design system", "visual identity", "video editing", "brand assets" | Check `facts.md` honestly. Product-side UX is not graphic design, and a tool listed as an aspiration is not a skill |
+
+**This does not touch the stated-language rule.** Never infer a language bar from the fact that a
+posting is written in a given language — that rule stands. This screen reads what the *work
+produces*, which is a different question from what the employer *requires*. One posting stated no
+language bar at all and was still unbuildable, because the deliverable was editorial copy.
+
+Use this screen only where the mission block is unambiguous about the core deliverable. It is
+deliberately narrow: two categories, both tied to something `facts.md` explicitly cannot claim.
+
+**A gate or screen hit means the role does not enter the digest.** Log it under a `Screened out` section
 with the one-line reason, so every decision the filter made stays auditable and the user can
 overrule any of them.
 
