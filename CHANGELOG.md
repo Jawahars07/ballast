@@ -11,6 +11,26 @@ examples, and corrections.
 
 ## [Unreleased]
 
+### Changed
+
+- **`jd-analyser` now returns two scores instead of one.** The single score measured only
+  whether a candidate clears a posting's stated bar, which meant a posting whose requirements
+  were all personality traits scored the same as one with real, screening requirements. Three
+  postings analysed in the same week all returned 5.0 despite being very different
+  opportunities.
+  - **FIT** is computed from **TESTABLE requirements only** — things an employer can screen on
+    with a fact or a document. Unfalsifiable traits (*dynamic, proactive, team player, high
+    potential, entrepreneurial spirit*) are listed, marked `S`, and excluded from the arithmetic.
+  - When fewer than three requirements are testable, FIT is reported as **not meaningful** and
+    the decision rests on EDGE.
+  - The raw pre-clamp value is now shown whenever it exceeds 5.0, because saturation is itself
+    a signal that the bar sits well below the candidate's level.
+  - **EDGE** is new: differentiated asset, archetype fit, bar selectivity, and warm path, each
+    scored 0 to 1.25. **Bar selectivity is inverted against intuition on purpose** — a hard bar
+    you clear removes competitors, a soft bar you clear removes nobody. The old formula scored
+    easy postings highest, which was exactly backwards.
+  - A decision matrix combines both, so "clears the bar" and "worth the hours" stop being fused.
+
 ### Fixed
 
 - `heavy-build-protocol` described its loop as seven phases while listing eight. The loop is
