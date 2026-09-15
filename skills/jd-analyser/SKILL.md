@@ -1,6 +1,6 @@
 ---
 name: jd-analyser
-description: Split a job description into what it actually REQUIRES versus what it merely describes, separate testable requirements from unfalsifiable personality traits, and return two scores - FIT (can you clear the stated bar) and EDGE (are you worth picking over the pile). Use the moment a posting arrives, before writing a line of any document. Prevents reading responsibilities as requirements, prevents over-claiming, and prevents a soft bar from scoring like a good opportunity.
+description: Split a job description into what it actually REQUIRES versus what it merely describes, then score the candidate against that JD alone - one number, MATCH out of 5, computed only from requirements an employer can actually test. Soft personality traits are listed but never scored. Everything that is not JD-match (employer history, target-role fit, warm contacts, unknowns) is reported as plain flags in words. Use the moment a posting arrives, before writing a line of any document.
 ---
 
 # JD Analyser
@@ -28,9 +28,7 @@ mistake structurally impossible.
 
 Before anything else, output one line:
 
-`**<Company> — <Role>. FIT X/5 · EDGE Y/5.** <one-sentence reason>`
-
-Never give a single fused number. A single number is what made this skill stop discriminating.
+`**<Company> — <Role>. MATCH X/5.**  <one-sentence reason>`
 
 Then run the analysis. Do not build any document until the user gives a go-ahead. A fast,
 honest verdict is worth more to them than a slow, thorough one they did not ask for yet.
@@ -138,69 +136,64 @@ Four verdicts, and only these four:
 - **PARTIAL** — related evidence exists at lower depth or scale; say exactly how it falls short
 - **MISSING** — nothing in `facts.md` backs it
 
-## Step 4 — FIT: can they clear the stated bar?
+## Step 4 — MATCH: how well does the evidence answer this JD?
 
-If any Step 2.5 gate failed, FIT is **2.0**. Stop here, do not compute.
+**One number. It scores the candidate against the job description, and nothing else.**
 
+If any Step 2.5 gate failed, MATCH is **2.0**. Stop here, do not compute.
 Otherwise, over **TESTABLE BAR items only**:
 
 ```
-raw = mean(EXCEEDS = 1.15, MEETS = 1.0, PARTIAL = 0.5, MISSING = 0) × 5
-FIT = min(raw, 5.0)
+raw   = mean(EXCEEDS = 1.15, MEETS = 1.0, PARTIAL = 0.5, MISSING = 0) × 5
+MATCH = min(raw, 5.0)
 ```
 
-Then adjust by at most ±0.5 for BONUS coverage. Never let a WORK bullet or a SOFT item move FIT.
+Then adjust by at most ±0.5 for BONUS coverage. Never let a WORK bullet or a SOFT item move MATCH.
 
 EXCEEDS is worth more than MEETS on purpose. Clearing a bar with room to spare is a real
 advantage, and an earlier version scored both at 1.0, which made EXCEEDS decorative.
 
-**Always report `raw` when it exceeds 5.0**, as `FIT 5.0 (raw 5.4, saturated)`. Saturation is
-information. It means the stated bar sits well below this candidate's level, which usually
-signals a large applicant pool rather than a great opportunity.
+**Show `raw` when it exceeds 5.0**, as `MATCH 5.0 (raw 5.4)`. A high raw means the stated bar
+sits well below the candidate's level.
 
-**If fewer than 3 BAR items are TESTABLE, FIT is not meaningful.** Say so in one line —
-*"only 1 of 5 stated requirements is testable, so FIT does not discriminate here"* — and let
-EDGE carry the decision.
+**If fewer than 3 BAR items are TESTABLE, say so in one line** — *"only 1 of 5 stated
+requirements is testable, so this score reflects very little"* — and lean on the flags below.
 
-## Step 4.5 — EDGE: is this worth the hours?
+### What MATCH deliberately does not include
 
-FIT answers whether the bar is clearable. It cannot answer whether to spend six hours building
-the package, because a bar that everyone clears produces a 5.0 and three hundred applicants.
+An earlier version of this skill folded four things into a second score: company history,
+archetype preference, how selective the bar was, and whether the candidate had a warm contact.
+That was a mistake, and it made the output hard to read. **Three of those four are not properties
+of the job description at all.** They are facts about the employer, about the candidate's own
+preferences, and about their network.
 
-Four components, 0–1.25 each, summed. Max 5.0.
+Mixing them into a score meant the number stopped answering the only question it was asked:
+*how well does this evidence answer this posting?*
 
-| Component | 1.25 | 0.6 | 0.2 |
-|---|---|---|---|
-| **Differentiated asset** | Something they built or wrote that names this company or its exact problem | A strong shipped project that maps to the role | Coursework only, nothing an employer could not find elsewhere |
-| **Archetype fit** | A **primary** target role in `profile.yml` | **secondary** or **adjacent** | outside every listed archetype |
-| **Bar selectivity** | A demanding bar they clear that removes most applicants — the bar itself is the moat | Mixed: at least one requirement does real screening | Everyone who reads it clears it, no moat |
-| **Warm path** | Named contact, prior interview, or referral | Prior application to this company | Cold portal only |
+They still matter. They belong in **Step 5 as plain flags**, in words, where a person can weigh
+them instead of having them silently averaged.
 
-Selectivity measures **how many applicants the bar removes**, not how testable it is. A bar can be perfectly testable and still remove nobody: *basic project management* and *knows Trello* are checkable and almost universal.
+## Step 5 — Flags: everything that matters but is not JD-match
 
-**Bar selectivity is deliberately inverted against intuition.** A hard bar you clear is *good
-news*, because it removes competitors. A soft bar you clear is *weak news*, because it removes
-nobody. A single-score formula gets this exactly backwards: the easier the posting, the higher
-it scores.
+Gates are already resolved in Step 2.5. State each of these in **one line**, as a fact, never as
+a number. Omit any that do not apply.
 
-## Step 4.6 — The decision, from both numbers
+| Flag | Say |
+|---|---|
+| **Bar softness** | If most BAR items are soft traits: *"the stated bar is mostly personality traits, so the CV has to do the sorting"* |
+| **Company history** | Prior applications and, critically, **how far they got**. An interview is a positive. Repeated CV-screen rejections are a negative, and they compound |
+| **Archetype** | Whether the role sits inside the target roles in `profile.yml`, or outside all of them |
+| **Warm path** | A named contact, a referral, or nothing |
+| **Duration / start / location** | Against stated preferences. If absent from the posting, **say so and ask** |
+| **Differentiated asset** | Anything built that names this employer or its exact problem |
 
-| FIT | EDGE | Call |
-|---|---|---|
-| < 3.5 | any | **Don't build.** The stated bar cannot be defended |
-| ≥ 3.5 | ≥ 3.5 | **Build now.** Highest priority |
-| ≥ 3.5 | 2.0–3.5 | **Build if the pipeline is thin.** Real but not differentiated |
-| ≥ 3.5 | < 2.0 | **Skip unless desperate.** They clear the bar and so does everyone; nothing sorts them |
+Then give the recommendation as **one sentence of judgement**, not a lookup:
+*build now · build if the pipeline is thin · don't build · need info first* — and say which flag
+drove it.
 
-Report both, always, as `FIT 4.8 / EDGE 4.7`. One number hides the trade-off that matters.
-
-## Step 5 — Deal-breaker check
-
-Gates are already resolved in Step 2.5. Here, report the non-gating constraints from
-`profile.yml`: contract duration against the preferred length, start date, contract type.
-
-If location or duration is **absent** from the posting, say so explicitly and ask. Never
-assume the city. Never assume the length.
+A high MATCH with bad flags is still a skip. A moderate MATCH with a warm contact and a
+differentiated asset is still a build. That judgement is easier to make, and easier to argue
+with, in words than inside a weighted average.
 
 ## Step 6 — Positioning brief
 
@@ -228,16 +221,14 @@ read of the JD.
 ## Output shape
 
 ```
-**<Company> — <Role>. FIT X/5 · EDGE Y/5.** <one-line reason>
+**<Company> — <Role>. MATCH X/5.**  <one-line reason>
 
 ### BAR (what they actually require)       ← table from Step 3, each row marked T or S
 ### WORK (what you'd do, not requirements)  ← bulleted, training-signals flagged
 ### BONUS / NOISE                           ← one line each
-### FIT                                     ← from TESTABLE rows only; show raw if saturated
-### EDGE                                    ← the four components, one line each
-### Deal-breakers                           ← or "none / unknown: <what>"
+### Flags                                   ← Step 5, one line each, words not numbers
 ### Positioning brief                       ← the four lines from Step 6
-### Recommendation                          ← from the Step 4.6 matrix
+### Recommendation                          ← one sentence, naming the flag that drove it
 ```
 
 ## Worked examples
@@ -269,49 +260,27 @@ fired. The language rule held in the other direction: the posting is written in 
 states only "intermediate English", so no French bar was invented. Duration (12 months) was
 flagged as a demotion, not a gate.
 
-## Worked examples, second set — why FIT and EDGE had to be split
+## Worked examples, second set — the soft-bar problem
 
-These three were analysed within two days of each other and every one returned **5.0** under the
-old single-score formula. They are not equivalent opportunities, and the split says so.
+Five postings analysed in five days. Under the *original* formula, which scored soft personality
+traits as if they were testable, the first four all returned **5.0**. They were not equivalent
+opportunities.
 
-**All three still show FIT 5.0.** That is not a failure of the fix, it is the finding. In this
-market the stated bars are overwhelmingly soft, so FIT saturates almost everywhere and was never
-the number worth reading. EDGE separates them cleanly: **3.70 / 3.55 / 0.65**.
+**All five still show a high MATCH.** That is the finding rather than a failure: in this market
+the stated bars are overwhelmingly soft, so MATCH saturates almost everywhere. **When it
+saturates, the flags decide** — which is exactly why they are written in words.
 
-**Company E — AI Builder, agency digital and tech team. FIT 5.0 (raw 5.38, only 2 of 6 testable) / EDGE 3.70. BUILD NOW.**
-Six BAR items and only **two are testable**: the degree field, and translating a business need
-into a concrete solution. *Appetite for AI*, *process logic*, *rigour and autonomy* and *good
-communication* are all SOFT, so FIT is flagged non-discriminating here too.
-EDGE carries it: differentiated asset **1.25**, because the candidate had published an
-open-source agent-skills project four days earlier and the posting's mission bullet read
-*"configure, test and document agents"*; archetype primary **1.25**; bar selectivity **1.0**,
-since the degree-field requirement genuinely screens; warm path **0.2**, cold portal.
-`1.25 + 1.25 + 1.0 + 0.2 = 3.70` → BUILD NOW.
+| Role | Testable | MATCH | The flag that decided it |
+|---|---|---|---|
+| Company E — AI Builder | 2 of 6 | 5.0 (raw 5.38) | **Differentiated asset.** An open-source agent-skills project published four days before applying, against a mission bullet reading *"configure, test and document agents"*. Primary archetype. **BUILD NOW** |
+| Company F — Category Manager | 1 of 5 | 5.0 (raw 5.75) | **Warm path + asset.** A category analysis whose deliverable was written for a manager at this exact employer, plus a named contact from an earlier application. **BUILD** |
+| Company G — Project coordination | 4 of 7 | 5.0 (raw 5.56) | **Archetype.** Outside every target role. Every mission verb is *participate, assist, help*; one is *write the meeting minutes*. Most testable bar of the five, least reason to want it. **SKIP UNLESS THIN** |
+| Company H — Corporate development | 3 of 5 | 5.0 (raw 5.50) | **Company history.** Five prior applications, **four rejected at CV screen**. Their filter already holds the profile and has removed it four times. **SKIP** |
+| Company I — Digital communications | 2 of 3 | 5.0 | **Mission block.** No language bar stated, but the deliverable is editorial copy in a language the candidate does not write. **DON'T BUILD** |
 
-**Company F — Sourcing Category Manager. FIT 5.0 (raw 5.75, only 1 of 5 testable) / EDGE 3.55. BUILD.**
-Only **1 of 5** BAR items is testable, that one being student status. The rest were *dynamic,
-organised, methodical, proactive, takes initiative, high potential, entrepreneurial spirit* —
-all SOFT. FIT is reported and explicitly flagged as non-discriminating, and the decision rests
-entirely on EDGE: differentiated asset **1.25**, because facts.md recorded a category analysis
-whose deliverable had been written for a manager at this exact company; archetype secondary
-**0.8**; bar selectivity **0.25**; warm path **1.25** from a named contact in an earlier
-application. `1.25 + 0.8 + 0.25 + 1.25 = 3.55` → BUILD.
-**A high EDGE on a meaningless FIT is still a build**, for a completely different reason than
-Company E.
-
-**Company G — Project coordination internship, IT operations. FIT 5.0 (raw 5.56, 4 of 7 testable) / EDGE 0.65. SKIP UNLESS THIN.**
-Four testable items, all cleared comfortably: student status, a stated English bar the candidate
-exceeded, *"**basic** project management skills"* against a real PM foundations certificate, and
-project tooling against two tools already in facts.md.
-
-This is the **most testable bar of the three**, and the lowest EDGE, which is the whole point:
-testable is not the same as selective. EDGE collapses it: differentiated asset **0.2**, archetype
-**0.0** (outside every target role), bar selectivity **0.25** (*basic* project management and
-*knows Trello* remove nobody), warm path **0.2**.
-`0.2 + 0.0 + 0.25 + 0.2 = 0.65` → SKIP UNLESS THIN. Every mission verb was *participate*,
-*assist*, *help*, and one was *write the meeting minutes*. **They clear the bar, and so does
-everyone else.** Under the old formula this scored identically to Company E, which is the bug
-that forced this rewrite.
+Read that table across and the point is hard to miss: **the score was never the interesting
+column.** Four of the five were decided by something a score cannot see, which is why those
+things belong in words rather than folded into a weighted average.
 
 ## The pattern to watch
 

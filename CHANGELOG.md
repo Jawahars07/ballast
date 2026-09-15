@@ -27,40 +27,24 @@ examples, and corrections.
 
 ### Changed
 
-- **`jd-analyser` now returns two scores instead of one.** The single score measured only
-  whether a candidate clears a posting's stated bar, which meant a posting whose requirements
-  were all personality traits scored the same as one with real, screening requirements. Three
-  postings analysed in the same week all returned 5.0 despite being very different
-  opportunities.
-  - **FIT** is computed from **TESTABLE requirements only** — things an employer can screen on
-    with a fact or a document. Unfalsifiable traits (*dynamic, proactive, team player, high
-    potential, entrepreneurial spirit*) are listed, marked `S`, and excluded from the arithmetic.
-  - When fewer than three requirements are testable, FIT is reported as **not meaningful** and
-    the decision rests on EDGE.
-  - The raw pre-clamp value is now shown whenever it exceeds 5.0, because saturation is itself
-    a signal that the bar sits well below the candidate's level.
-  - **EDGE** is new: differentiated asset, archetype fit, bar selectivity, and warm path, each
-    scored 0 to 1.25. **Bar selectivity is inverted against intuition on purpose** — a hard bar
-    you clear removes competitors, a soft bar you clear removes nobody. The old formula scored
-    easy postings highest, which was exactly backwards.
-  - A decision matrix combines both, so "clears the bar" and "worth the hours" stop being fused.
-
-### Fixed
-
-- `heavy-build-protocol` described its loop as seven phases while listing eight. The loop is
-  numbered from zero because phase 0 happens before the first tool call; it is now described
-  as eight phases numbered from zero, consistently across the skill, the README, the changelog
-  and the plugin description
-- `PROVENANCE.md` and the README said "no renames", which was ambiguous: three skills were
-  renamed from their private names when published (`fable-protocol` to `heavy-build-protocol`,
-  `career-latex-documents` to `cv-tailor`, `auto-apply` to `apply-prefill`). The claim being
-  made is that none is a re-badged copy of someone else's work, and both files now say that
-  and list the renames
-
-### Security
-
-- Branch protection active on `main` via a repository ruleset: pull request required, `validate`
-  must pass and be up to date, force-push and deletion blocked
+- **`jd-analyser` returns one score again: `MATCH`.** The two-score FIT/EDGE model shipped three
+  days earlier is withdrawn. It was over-engineered and it answered the wrong question.
+  - **MATCH scores the candidate against the job description and nothing else**, computed from
+    **TESTABLE requirements only** — things an employer can screen on with a fact or a document.
+    Unfalsifiable traits (*dynamic, proactive, team player, high potential*) are listed, marked
+    `S`, and excluded from the arithmetic. **This part was the real fix and it stays.**
+  - When fewer than three requirements are testable, the skill says the score reflects very
+    little rather than presenting it as meaningful.
+  - **EDGE is gone.** It folded four things into a number: employer history, target-role fit, bar
+    selectivity, and warm contacts. **Three of those four are not properties of the job
+    description at all.** Averaging them into a score made the output hard to read and stopped
+    the number answering the one question it was asked.
+  - Those factors now appear in **Step 5 as plain flags, in words** — bar softness, employer
+    history (weighted by how far the candidate got, since repeated CV-screen rejections are a
+    negative), target-role fit, warm path, unknowns, differentiated asset. The recommendation is
+    one sentence of judgement naming the flag that drove it, not a lookup in a matrix.
+  - Worked examples rewritten: five roles, all with a high MATCH, each decided by a different
+    flag. The table makes the point that the score was never the interesting column.
 
 ## [1.0.0] - 2026-09-11
 
