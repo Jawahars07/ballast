@@ -50,7 +50,8 @@ verified. Every claim traces to `facts.md`.
 
 ## Workflow
 
-1. **Quick score first.** One line, out of 5, with the reason. Wait for a go-ahead before building.
+1. **Quick score first.** `jd-analyser`'s one line — FIT out of 100, band, confidence, reason.
+   Wait for a go-ahead before building.
 2. **Run `jd-analyser`.** Take its positioning brief as the spec.
 3. **Copy the template**, do not start from scratch:
    ```bash
@@ -65,8 +66,9 @@ verified. Every claim traces to `facts.md`.
    tectonic cl-<company-slug>.tex
    ```
 6. **Verify** with the pass below. Never ship a document that fails it.
-7. **Report** exact filenames, compiler result, each verification result, and any honest gaps.
-   State the numbers: "1 page, all six headings found, 0 hidden characters, 4/4 JD terms backed."
+7. **Report** the document scorecard below: exact filenames, compiler result, every check with
+   its number, and any honest gaps. "1 page, 6/6 headings, 0 hidden characters, keyword coverage
+   9/10 (90%), 5/8 bullets carry a number" — never "looks good".
 
 ## ATS verification pass
 
@@ -89,7 +91,12 @@ pdftotext "$PDF" - | head -5
 pdftotext "$PDF" - | grep -inE '^(education|experience|projects|skills|languages|certifications)'
 
 # 4. Hidden or zero-width characters — must be 0
-pdftotext "$PDF" - | grep -cP '[\x{200B}-\x{200D}\x{FEFF}\x{00AD}]'
+#    (perl, not grep -P: stock macOS grep has no -P and errors out)
+pdftotext "$PDF" - | perl -CS -ne '$n++ if /[\x{200B}-\x{200D}\x{FEFF}\x{00AD}]/; END { print $n+0, "\n" }'
+
+# 4b. Ligature glyphs — must be 0. "ﬁnding" is one glyph to a parser, so a search
+#     for "finding" misses it. The bundled templates turn common ligatures off.
+pdftotext "$PDF" - | perl -CS -ne '$n++ if /[\x{FB00}-\x{FB06}]/; END { print $n+0, "\n" }'
 
 # 5. Layout vs plain extraction must agree in word count (a big gap means
 #    multi-column or table layout the parser will scramble)
@@ -110,11 +117,82 @@ text. Tab-aligned dates are fine for text search but can confuse portal autofill
 infer structured fields from layout. If a portal is Workday- or SuccessFactors-shaped, consider
 supplying a plain `.docx` alongside the PDF, with dates stacked rather than tab-aligned.
 
+## Keyword coverage — the number an ATS ranks on
+
+Matching engines rank a CV by how many of the posting's terms they can find in the extracted
+text, weighting hard skills over soft ones and terms inside dated roles over a bare skills list.
+Measure it on the PDF, not the `.tex`.
+
+1. Write `terms.txt`, one term per line: every **hard skill, tool, method and the job title**
+   from `jd-analyser`'s scorecard, **using the JD's exact spelling**. Mark each line `B` if
+   `facts.md` backs it (credit > 0), `U` if it does not: `B	Power BI`, `U	Amplitude`.
+2. Run:
+
+```bash
+pdftotext "$PDF" - | tr '\n' ' ' > cv.txt
+while IFS=$'\t' read -r tag term; do
+  if grep -qiF -- "$term" cv.txt; then echo "HIT   $tag  $term"; else echo "MISS  $tag  $term"; fi
+done < terms.txt
+```
+
+3. Report two numbers:
+   - **Backed coverage** = `B` hits / `B` terms. **Target 80% or more.** Match-rate tools
+     recommend 75–80%; callback rates flatten above roughly 90, and chasing 100% produces a CV
+     that reads like the posting pasted back.
+   - **Raw coverage** = all hits / all terms. Informational only. The gap between the two is
+     the honest ceiling — it is the part of the posting this candidate cannot answer.
+4. **A `U` term that shows up as a HIT is a fabrication alarm.** Find where it came from and
+   remove it, unless it is plainly incidental (the word appearing in a school name).
+5. **Placement check:** the JD's top three backed terms should appear in the first 15 extracted
+   lines (profile line plus the most relevant role), and at least once inside a dated role, not
+   only in the skills block.
+
+```bash
+# Per term, not grep -c: -c counts matching LINES, so three terms on one line reads as "1"
+pdftotext "$PDF" - | head -15 > top.txt
+for t in "<term 1>" "<term 2>" "<term 3>"; do
+  if grep -qiF -- "$t" top.txt; then echo "HIT   $t"; else echo "MISS  $t"; fi
+done
+```
+
+Never add a `U` term to close the gap. The fix for low backed coverage is wording a real bullet
+in the JD's own vocabulary. The fix for low raw coverage is a different job.
+
+## Document scorecard — report this, every build
+
+One table, every row a number. This is what the user reads first.
+
+| Check | Result | Pass bar |
+|---|---|---|
+| Pages | 1 | 1 |
+| Extracted words | 540 | > 0 |
+| Contact in first 5 lines | yes | yes |
+| Headings found, in order | 6/6 | all |
+| Hidden / zero-width characters | 0 | 0 |
+| Ligature glyphs | 0 | 0 |
+| Plain vs layout word delta | 0 | ≈ 0 |
+| Language claims above `facts.md` | 0 | 0 |
+| **Backed keyword coverage** | 9/10 (90%) | ≥ 80% |
+| Raw keyword coverage | 9/13 (69%) | info |
+| Top-3 terms in first 15 lines | 3/3 | 3/3 |
+| Unbacked terms present | 0 | 0 |
+| Bullets carrying a number or named outcome | 5/8 | ≥ half |
+| Bullets over two lines | 0 | 0 |
+| `human-voice` Part 2 banned terms / em-dashes | 0 / 0 | 0 / 0 |
+| Roles where every bullet shares one shape | 0 | 0 |
+
+Then **Writing improvements**: at most three, each tied to a specific bullet, quoting the line and
+the replacement. Priority order: (1) a bullet with no outcome where `facts.md` records one;
+(2) a backed JD term that is missing or sits only in the skills block — move it into the dated
+bullet that proves it; (3) a rhythm fix from `human-voice` Part 2. Never propose a number or a
+tool `facts.md` does not hold.
+
 ## Design pattern
 
 The bundled template follows the conventions that survive ATS parsing:
 
-- `lmodern`, single column, no tables in the body, no text boxes, no headers or footers
+- Latin Modern through `fontspec` with common ligatures off, so every word extracts as plain
+  letters. Single column, no tables in the body, no text boxes, no headers or footers
 - Contact row hyperlinked, but never a bare URL printed as visible text
 - Small-caps section headings with a rule underneath, standard heading names
 - Dark, mid, and light greys only — colour that survives a black-and-white print

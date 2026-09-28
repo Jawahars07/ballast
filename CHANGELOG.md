@@ -11,6 +11,50 @@ examples, and corrections.
 
 ## [Unreleased]
 
+### Changed — breaking (the score means something different now)
+
+- **`jd-analyser` replaces `MATCH x/5` with `FIT x/100`.** MATCH averaged only the requirement
+  lines that survived a "testable" filter. Most requirement blocks are one or two testable lines
+  plus personality traits, so it returned 5.0 almost everywhere: three consecutive real reads
+  scored 5.0, 5.0 and a capped 2.0. One of those 5.0s was a role whose central task, running
+  A/B tests, the candidate had no evidence for at all.
+  - **Six categories, weighted the way enterprise ATS matching engines weight them:** hard
+    skills 40, relevant experience 20, education 15, languages 10, certifications 5, preferred
+    extras 10. Categories the posting never mentions are dropped and the rest renormalised.
+  - **Evidence strength replaces verdict words:** dated role or shipped project 1.0, list or
+    coursework only 0.6, named transferable equivalent 0.3, nothing 0. No item can exceed 1.0,
+    so the "raw 5.75" outputs are gone.
+  - **Tools in the responsibilities block now count**, at half the weight of stated
+    requirements, because keyword engines read the whole posting. Anything the posting promises
+    to teach counts zero. Soft traits still never count.
+  - **Gates are pass/fail and no longer cap the number.** A blocked role still shows its FIT,
+    so "fits, but one gate kills it" reads differently from "does not fit".
+  - **Confidence** (High / Medium / Low, by items scored) is printed next to every number.
+  - **New flag: core-task gap.** **New step: up to three honest improvements**, each with its
+    point value.
+  - Re-scored worked examples: the same three postings now read 55 Stretch, 84 Strong, and
+    70 Good-but-blocked.
+- **`cv-tailor` ends with a document scorecard.** Backed keyword coverage (target 80%+, measured
+  on the extracted PDF text), raw coverage, top-term placement, an unbacked-term fabrication
+  alarm, bullet outcome and length checks, and at most three quoted rewrites.
+- **`application-package`** presents FIT, the document scorecard and the rewrites in that order.
+  The tracker `score` column holds `FIT/20` so 5-point trackers keep sorting.
+
+### Fixed
+
+- **CV and cover-letter templates broke ATS keyword search.** Under tectonic (a XeTeX engine),
+  the 8-bit `T1` + `lmodern` setup emitted "fi" and "fl" as single ligature glyphs, so a parser
+  searching for *office*, *certified*, *profile*, *workflow* or *financial* found nothing. The
+  same setup extracted the contact-row separator as `ů` (glued to the email address) and
+  silently dropped em-dashes. Both templates now use `fontspec` with Latin Modern OTF and common
+  ligatures off. Verified: the old template misses a search for "finding", the new one hits.
+- **ATS check 4 errored on stock macOS**, because BSD grep has no `-P`. Replaced with a portable
+  `perl` one-liner, and added check 4b for ligature glyphs.
+- A missing space after the phone number in the contact row.
+- **`\role` never ended its paragraph**, so text after an entry ran onto the organisation line
+  and a parser read the location as "City Relevant coursework". Fixed with a `\par`.
+- The template itself showed an em-dash in visible text, which `human-voice` bans.
+
 ### Added
 
 - **`job-triage` gains a mission-block screen.** Two categories that no stated requirement

@@ -38,7 +38,9 @@ Scaffold from `examples/` if these do not exist. Never invent the user's backgro
 
 One line, before any other work:
 
-`**<Company> — <Role>. X/5.** <one-sentence reason>`
+`**<Company> — <Role>. FIT X/100 (<band>, <confidence> confidence).** <one-sentence reason>`
+
+That line comes straight from `jd-analyser` Step 0. If a gate failed, it says BLOCKED and names the gate.
 
 Then stop and wait. Do not build documents until the user says go. Most roles should not be
 built, and finding that out in ten seconds is the point.
@@ -61,7 +63,7 @@ and a naive fetch returns an empty shell that looks like a dead posting when it 
 | **B. Requirements** | The BAR table from `jd-analyser`, with per-item verdicts |
 | **C. Evidence map** | Which `facts.md` line backs which requirement |
 | **D. Gaps** | Honest, specific, named. **This is the only place gaps are ever written down** |
-| **E. Score** | The number, the arithmetic behind it, and the deal-breaker check |
+| **E. Score** | Eligibility (PASS or the failed gate), the FIT scorecard table with every category, credit and point, the confidence level, and the up-to-three honest improvements |
 | **F. Positioning** | The four-line brief the documents must be built from |
 | **G. Recommendation** | build / don't build / need info first |
 
@@ -79,7 +81,8 @@ mandatory, every build. Working from memory on voice is a documented failure, no
 Run `cv-tailor`'s ATS pass and `human-voice`'s Part 2 scan. Then report actual results:
 
 > "1 page. All six headings found in order. 0 hidden characters. plain/layout delta 0.
-> 4 of 4 JD terms backed by facts.md. 0 banned terms. 0 em-dashes."
+> 0 ligature glyphs. Backed keyword coverage 9/10 (90%),
+> 0 unbacked terms present. 0 banned terms. 0 em-dashes."
 
 Never write "should be fine" or "looks good". Either you ran the check and have a number, or you
 did not run it and say so.
@@ -96,13 +99,23 @@ num	date	company	role	source	url	status	score	report
 number. Reusing a report number here silently overwrites an unrelated row, which is a real bug
 that has happened. Read the file, find the max, add one.
 
+The `score` column holds `FIT/20` to one decimal (FIT 72 → `3.6`), so a tracker built on a
+5-point scale keeps sorting correctly. The full FIT lives in the report.
+
 Statuses, and only these: `Evaluated` · `Applied` · `Screening` · `Interview` · `Offer` ·
 `Rejected` · `Withdrawn` · `Discarded`.
 
 ### 7. Present, do not send
 
-Show the user: the score, the report path, both PDF paths, the verification numbers, and the
-honest gaps. Then stop.
+Show the user, in this order:
+
+1. **FIT** — number, band, confidence, and the flag that drove the recommendation
+2. **Document scorecard** from `cv-tailor` — every row a number, backed keyword coverage first
+3. **Writing improvements** — at most three, quoted line and replacement
+4. **Paths** — report, CV PDF, cover-letter PDF
+5. **Honest gaps** — from Block D, for their eyes only
+
+Then stop.
 
 ## Standing rules
 

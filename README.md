@@ -46,9 +46,9 @@ So these skills are mostly rules about restraint:
 
 | Skill | What it does |
 |---|---|
-| **`jd-analyser`** | Sorts every line of a posting into **BAR** (what they require) · **WORK** (what you'd do) · **BONUS** · **NOISE**. Scores from BAR only. Six hard gates that cap the score at 2.0 and stop the process |
+| **`jd-analyser`** | Sorts every line of a posting into **BAR** (what they require) · **WORK** (what you'd do) · **BONUS** · **NOISE**. Six pass/fail knock-out gates, then **FIT out of 100** across six weighted categories, with a confidence level, flags in words, and the honest edits that would raise it |
 | **`human-voice`** | Removes the AI tells. Part 1 for prose, Part 2 for CVs — because the CV tell is **rhythm**, not vocabulary, and everyone optimises for the wrong one |
-| **`cv-tailor`** | One-page LaTeX CV and cover letter, compiled with `tectonic`, verified the way an ATS parser actually reads a PDF |
+| **`cv-tailor`** | One-page LaTeX CV and cover letter, compiled with `tectonic`, verified the way an ATS parser actually reads a PDF. Ends with a **document scorecard**: keyword coverage, placement, parse checks, writing checks, three concrete rewrites |
 | **`application-package`** | Runs the three above in order and produces a tracked package. Stops before submission |
 | **`job-triage`** | Screens a list of postings on the requirements block before anything reaches your short-list |
 | **`apply-prefill`** | Fills application forms in your browser. **Never clicks Submit.** Ten named halts that fire rather than guess |
@@ -62,6 +62,37 @@ optimises against the wrong half of the page.
 X"*, then X is a **training subject, not a requirement** — even when X is in the job title. They
 are hiring to train. I once built a specialist CV for a role like that and got called delusional,
 correctly.
+
+### How the score works
+
+`jd-analyser` scores the way enterprise ATS matching engines and recruiters rank candidates,
+not the way a job seeker hopes they do:
+
+1. **Knock-out gates first, pass or fail.** Degree field, specialised school, stated language,
+   a required tool you have no evidence for, location, work authorisation. A failed gate means
+   *don't build*, but the FIT is still shown, so you can see how close it was.
+2. **FIT out of 100**, from six categories weighted like the engines weight them:
+
+   | Hard skills & tools | Relevant experience | Education | Languages | Certifications | Preferred extras |
+   |---|---|---|---|---|---|
+   | 40 | 20 | 15 | 10 | 5 | 10 |
+
+   Categories the posting never mentions are dropped and the rest renormalised. Every item is
+   credited by **evidence strength**: used in a dated role or shipped project **1.0** ·
+   skills-list or coursework only **0.6** · a named transferable equivalent **0.3** · nothing **0**.
+   Tools named only in the responsibilities count at half the weight of stated requirements;
+   anything the posting promises to *teach* counts zero. Soft traits (*proactive, team player*)
+   never count.
+3. **Bands:** 80+ Strong · 65–79 Good · 50–64 Stretch · under 50 Weak. **Confidence** is
+   High / Medium / Low by how many items were actually scored, and is always printed.
+4. **Flags in words** for everything that is not about the posting: core-task gap, employer
+   history, warm path, archetype, unknown duration or location.
+5. **Up to three honest improvements**, each with its point value. Mostly: evidence you have
+   but never wrote down.
+
+Then, after the documents are built, `cv-tailor` measures the PDF itself: **backed keyword
+coverage** (target 80%+), whether the top terms sit where a parser weights them, and whether
+every word extracts as plain text.
 
 ### `ship-safe` — two gates before something becomes irreversible
 
@@ -178,6 +209,28 @@ brew install tectonic poppler        # macOS
 
 `ship-safe` and `deep-work` need nothing at all.
 
+On Linux, `sudo apt install poppler-utils` and follow the
+[tectonic install guide](https://tectonic-typesetting.github.io/en-US/install.html).
+
+### Your first application, step by step
+
+1. **Fill `facts.md` once, properly.** Every role, project and number, and for each skill,
+   *where* you used it. This is the hour that makes every later application fast and honest.
+2. **Set `profile.yml`**: where you can work, your language levels, roles you want, roles you
+   refuse.
+3. **Paste a job description** into your agent and say *"analyse this JD"*. You get one line
+   first:
+
+   > **Company X — Data Analyst Apprentice. FIT 72/100 (Good, High confidence).** Power BI and
+   > SQL demonstrated in a dated role; the Python they list sits at coursework depth.
+
+   Then the scorecard, the flags, and up to three honest edits that would raise it.
+4. **Decide.** Say *"build it"* only if the number and the flags say so. Most postings should
+   stop here, and finding that out in a minute is the point.
+5. **Get the package**: a tailored one-page CV and cover letter as PDFs, plus a document
+   scorecard (keyword coverage, parse checks, writing checks) and three concrete rewrites.
+6. **Read it, then send it yourself.** Nothing here ever clicks Submit.
+
 ### Updating
 
 ```bash
@@ -212,8 +265,10 @@ people's.
   is unproven — rejection reasons are almost never disclosed.
 - **`council` gives you five framings from one model, not five independent minds.** Correlated
   blind spots stay blind.
-- **`jd-analyser`'s scoring formula is a heuristic**, not a calibrated model. The value is the
-  BAR/WORK separation and the hard gates. The number is a conversation-starter.
+- **`jd-analyser`'s weights follow published ATS category weightings**, but they are not
+  calibrated on outcomes, and every employer configures its own. Read FIT as a ranking between
+  your own options, not a probability of an interview. The gates and the BAR/WORK split are
+  where most of the value is.
 - **`apply-prefill` will be blocked** by anti-bot protection on major boards. Fall back to
   guiding a human click by click.
 
