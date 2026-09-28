@@ -54,6 +54,11 @@ Stack: Next.js, TypeScript, an LLM API
 The Verdict column is **binding**. A skill marked "never claim" never appears in a document,
 regardless of what a job description asks for.
 
+The Evidence column also sets the score. `jd-analyser` credits a skill **1.0** when the evidence
+is a dated role or a shipped project, **0.6** when it is coursework, a certificate or a list
+entry only. Write down *where* you used each skill, not just that you have it. A skill you use
+but never recorded here scores zero, and that is the most common reason a real fit scores low.
+
 | Skill | Evidence | Depth | Verdict |
 |---|---|---|---|
 | Python | 3 shipped projects | Working proficiency, not a specialist | Claim |

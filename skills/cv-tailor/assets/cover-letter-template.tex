@@ -8,9 +8,14 @@
 %==============================================================================
 \documentclass[a4paper,11pt]{article}
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
+% fontspec, not T1+lmodern: tectonic is XeTeX-based, and 8-bit T1 fonts there
+% extract "·" as "ů", drop em-dashes silently, and emit "fi" as one ligature
+% glyph an ATS keyword search cannot match. NoCommon keeps "fi"/"fl" as letters.
+\usepackage{fontspec}
+\setmainfont{lmroman10}[
+  Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+  ItalicFont=*-italic, BoldItalicFont=*-bolditalic,
+  SmallCapsFont=lmromancaps10-regular, Ligatures={TeX,NoCommon}]
 \usepackage[left=2.2cm,right=2.2cm,top=1.8cm,bottom=1.8cm]{geometry}
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
@@ -34,7 +39,7 @@
 
 {\Huge\scshape \FullName}\\[3pt]
 {\color{mid}\small
-  \href{mailto:\Email}{\Email} \textbf{·} \Phone \textbf{·}
+  \href{mailto:\Email}{\Email} \textbar{} \Phone{} \textbar{}
   \href{\SiteURL}{\Site}}\\[4pt]
 {\color{rule}\hrule}
 \vspace{10pt}

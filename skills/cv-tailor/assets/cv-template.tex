@@ -14,9 +14,14 @@
 %==============================================================================
 \documentclass[a4paper,10pt]{article}
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
+% fontspec, not T1+lmodern: tectonic is XeTeX-based, and 8-bit T1 fonts there
+% extract "·" as "ů", drop em-dashes silently, and emit "fi" as one ligature
+% glyph an ATS keyword search cannot match. NoCommon keeps "fi"/"fl" as letters.
+\usepackage{fontspec}
+\setmainfont{lmroman10}[
+  Extension=.otf, UprightFont=*-regular, BoldFont=*-bold,
+  ItalicFont=*-italic, BoldItalicFont=*-bolditalic,
+  SmallCapsFont=lmromancaps10-regular, Ligatures={TeX,NoCommon}]
 \usepackage[left=1.4cm,right=1.4cm,top=1.2cm,bottom=1.2cm]{geometry}
 \usepackage{titlesec}
 \usepackage{enumitem}
@@ -39,7 +44,7 @@
 % \role{Title}{Organisation}{Location}{Dates}
 \newcommand{\role}[4]{%
   \vspace{3pt}\textbf{#1} \hfill \textcolor{mid}{#4}\\[1pt]
-  \textcolor{mid}{#2\ifx\relax#3\relax\else, #3\fi}\vspace{1pt}}
+  \textcolor{mid}{#2\ifx\relax#3\relax\else, #3\fi}\vspace{1pt}\par}
 
 %------------------------------------------------------------------ EDIT BELOW
 \newcommand{\FullName}{Your Name}
@@ -58,10 +63,10 @@
 
 {\Huge\scshape \FullName}\\[3pt]
 {\color{mid}\small
-  \href{mailto:\Email}{\Email} \textbf{·}
-  \Phone \textbf{·}
-  \href{\SiteURL}{\Site} \textbf{·}
-  \href{\GitHubURL}{\GitHub} \textbf{·}
+  \href{mailto:\Email}{\Email} \textbar{}
+  \Phone{} \textbar{}
+  \href{\SiteURL}{\Site} \textbar{}
+  \href{\GitHubURL}{\GitHub} \textbar{}
   \href{\LinkedInURL}{\LinkedIn}}\\[5pt]
 {\small \Tagline}
 
@@ -92,7 +97,7 @@ about. Cut the rest.
 \end{itemize}
 
 \section{Projects}
-\textbf{Project name} \textcolor{mid}{— \href{https://example.com}{live}} \\
+\textbf{Project name} \textcolor{mid}{| \href{https://example.com}{live}} \\
 What it does, in one sentence a non-specialist understands, plus the one result worth stating.
 Stack: the three tools that matter.
 
