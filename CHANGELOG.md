@@ -9,7 +9,17 @@ For skills, semantic versioning is read as: **major** = a rule changed such that
 produces materially different output; **minor** = a new skill or a new rule; **patch** = wording,
 examples, and corrections.
 
-## [Unreleased]
+## [2.0.0] - 2026-09-28
+
+### Added
+
+- **`GUIDE.md`** — setup for Claude Code, the Claude desktop app and claude.ai, ChatGPT (with
+  skills on Business / Enterprise / Edu, via a Project on Free / Plus), Codex, and every other
+  Agent Skills tool. Also the everyday loop, prompts to copy, how to read FIT and the document
+  scorecard, and troubleshooting. Linked from the top of the README.
+- **Release assets:** one upload-ready ZIP per skill, `career-forge-all.zip`, and
+  `chat-project-kit.zip` (the four career skills renamed for chat apps, both templates,
+  example facts and profile, and ready-to-paste Project instructions).
 
 ### Changed — breaking (the score means something different now)
 
@@ -55,7 +65,7 @@ examples, and corrections.
   and a parser read the location as "City Relevant coursework". Fixed with a `\par`.
 - The template itself showed an em-dash in visible text, which `human-voice` bans.
 
-### Added
+### Added — earlier in this release cycle
 
 - **`job-triage` gains a mission-block screen.** Two categories that no stated requirement
   catches, and that no CV can work around: **authorship as the deliverable** (editorial copy,
@@ -69,7 +79,7 @@ examples, and corrections.
 - **`job-triage` gains a portfolio gate** — a required portfolio, book, or prior placement in a
   craft the candidate has never practised.
 
-### Changed
+### Changed — earlier in this release cycle (MATCH, superseded by FIT above)
 
 - **`jd-analyser` returns one score again: `MATCH`.** The two-score FIT/EDGE model shipped three
   days earlier is withdrawn. It was over-engineered and it answered the wrong question.

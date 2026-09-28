@@ -17,6 +17,11 @@ They follow the [Agent Skills open standard](https://agentskills.io), so they wo
 Code, Codex, Cursor, Gemini CLI, Copilot, OpenCode, Goose and ~40 other tools. **Install takes
 one command** — see [Install](#install).
 
+> **Here for job applications?** Read **[GUIDE.md](GUIDE.md)**. It has step-by-step setup for
+> Claude Code, the Claude desktop app, ChatGPT, Codex and the rest, the everyday loop, prompts to
+> copy, and how to read the scores. Ready-made ZIPs for the upload screens are on the
+> [releases page](https://github.com/Jawahars07/ballast/releases/latest).
+
 **Pure markdown. No scripts, no dependencies, no network calls, nothing to execute.**
 [Enforced in CI](.github/workflows/validate.yml), not just promised. See [SECURITY.md](SECURITY.md).
 
